@@ -15,23 +15,27 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
     @IBOutlet weak var recordingLabel: UILabel!
     @IBOutlet weak var recordButton: UIButton!
     @IBOutlet weak var stopRecordingButton: UIButton!
+    var isRecording: Bool = false {
+        didSet {
+            self.stopRecordingButton.alpha = isRecording ? 1.0 : 0.5
+            self.stopRecordingButton.isEnabled = isRecording
+            self.recordButton.alpha = isRecording ? 0.5 : 1.0
+            self.recordButton.isEnabled = !isRecording
+            self.recordingLabel.text = isRecording ? "Recording ..." : "Tap To Record"
+        }
+    }
     
+    //I used alpha to stop button will be disabled in shaded colors when there is no audio recording.
     override func viewDidLoad() {
         super.viewDidLoad()
-        stopRecordingButton.isEnabled = false
-        stopRecordingButton.alpha = 0.5
+        isRecording = false
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     }
 
     @IBAction func recordAudio(_ sender: UIButton) {
-        recordingLabel.text = "Recording in Progress"
-        stopRecordingButton.isEnabled = true
-        stopRecordingButton.alpha = 1.0
-        recordButton.isEnabled = false
-        recordButton.alpha = 0.5
-        
+        isRecording = true
         
         let dirPath = NSSearchPathForDirectoriesInDomains(.documentDirectory,.userDomainMask, true)[0] as String
                 let recordingName = "recordedVoice.wav"
@@ -49,11 +53,7 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
     }
     
     @IBAction func stopRecording(_ sender: UIButton) {
-        recordButton.isEnabled = true
-        recordButton.alpha = 1.0
-        stopRecordingButton.isEnabled = false
-        stopRecordingButton.alpha = 0.5
-        recordingLabel.text = "Tap to record"
+       isRecording = false
         audioRecorder.stop()
             let audioSession = AVAudioSession.sharedInstance()
             try! audioSession.setActive(false)
